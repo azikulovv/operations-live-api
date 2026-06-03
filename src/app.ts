@@ -1,14 +1,15 @@
-import express from 'express'
 import cors from 'cors'
+import express from 'express'
 
-import { errorMiddleware } from '@/common/middlewares/error.middleware'
+import { env } from '@/config/env'
 import { authRoutes } from '@/modules/auth/auth.routes'
+import { errorMiddleware } from '@/common/middlewares/error.middleware'
 
 export const app = express()
 
 app.use(
   cors({
-    // origin: env.FRONTEND_URL,
+    origin: env.FRONTEND_URL,
     credentials: true,
   }),
 )
@@ -18,7 +19,7 @@ app.use(express.json())
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
-    service: 'backend-core',
+    service: 'operations-live-api',
   })
 })
 
