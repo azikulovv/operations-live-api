@@ -1,17 +1,15 @@
-import { UserRole } from '@prisma/client'
 import { prisma } from '@/database/prisma'
+import { signAccessToken } from '@/common/utils/jwt'
 import { unauthorized } from '@/common/errors/app-error'
 import { verifyPassword } from '@/common/utils/password'
-import { signAccessToken } from '@/common/utils/jwt'
+import { UserRepository } from '../user/user.repository'
 import type { SignInDto } from '@/modules/auth/auth.schemas'
 
 export class AuthService {
+  private readonly userRepository = new UserRepository(prisma)
+
   async signIn(dto: SignInDto) {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: dto.email,
-      },
-    })
+    const user = await this.userRepository.findByEmail(dto.email)
 
     if (!user) {
       throw unauthorized('Неверный email или пароль')
