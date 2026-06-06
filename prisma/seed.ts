@@ -30,6 +30,12 @@ const users = [
     password: 'password123',
     role: UserRole.HOSTESS,
   },
+  {
+    email: 'bartender@duck.local',
+    name: 'Бармен',
+    password: 'password123',
+    role: UserRole.BARTENDER,
+  },
 ]
 
 async function main() {
@@ -62,7 +68,7 @@ async function main() {
 }
 
 main()
-  .catch((error) => {
+  .catch(error => {
     console.error('❌ Seed error:', error)
     process.exit(1)
   })

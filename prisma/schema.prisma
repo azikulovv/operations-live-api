@@ -10,6 +10,7 @@ enum UserRole {
   MANAGER
   ADMIN
   HOSTESS
+  BARTENDER
 }
 
 model User {
@@ -23,69 +24,4 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@map("users")
-}
-
-model Event {
-  id                String    @id @default(cuid())
-  externalId        String?   @unique
-  title             String
-  city              String
-  address           String
-  features          String    @default("")
-  gameRules         String    @default("")
-  gameType          String
-  startsAt          DateTime
-  endsAt            DateTime?
-  participantLimit  Int
-  imageUrl          String?
-  imageHash         String?
-  status            String    @default("draft")
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  registrationCount Int
-
-  participants EventParticipant[]
-}
-
-model EventParticipant {
-  id             String                   @id @default(cuid())
-  externalId     String                   @unique
-  externalUserId String
-  eventId        String
-  event          Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  status         String
-  createdAt      DateTime
-  cancelledAt    DateTime?
-  position       Int?
-  tableNumber    Int
-  seatNumber     Int
-  userAvatarUrl  String?
-  userAvatarHash String?
-  userEmail      String
-  userUsername   String
-  userPhone      String
-  userRole       String
-  userCreatedAt  DateTime
-  userUpdatedAt  DateTime
-  userBadge      Int?
-  closed         Boolean                  @default(false)
-  payment        EventParticipantPayment?
-  updatedAt      DateTime                 @updatedAt
-
-  @@index([eventId])
-  @@map("event_participants")
-}
-
-model EventParticipantPayment {
-  id            String           @id @default(cuid())
-  participantId String           @unique
-  participant   EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  tournament    Int              @default(0)
-  bar           Int              @default(0)
-  games         Int              @default(0)
-  paid          Int              @default(0)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-
-  @@map("event_participant_payments")
 }
