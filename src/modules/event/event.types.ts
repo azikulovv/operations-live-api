@@ -74,6 +74,7 @@ export interface Participant {
   position: number | null
   tableNumber: number
   seatNumber: number
+  userBadge?: number | null
   user: ParticipantUser
   payment?: ParticipantPayment | null
 }

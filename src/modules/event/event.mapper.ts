@@ -77,6 +77,7 @@ export function mapEventParticipantToParticipant(
     position: participant.position,
     tableNumber: participant.tableNumber,
     seatNumber: participant.seatNumber,
+    userBadge: participant.userBadge,
     user: {
       id: participant.externalUserId,
       avatarUrl: participant.userAvatarUrl ?? '',

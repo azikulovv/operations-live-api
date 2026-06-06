@@ -4,6 +4,7 @@ import { EventRepository } from './event.repository'
 import { EventExternalClient } from './event.external-client'
 import { mapEventParticipantToParticipant } from './event.mapper'
 import { emitActiveEventsUpdated, emitEventParticipantsUpdated } from './event.realtime'
+import type { UpdateEventParticipantDto } from './event.schemas'
 
 export class EventService {
   private readonly eventRepository: EventRepository
@@ -60,5 +61,33 @@ export class EventService {
     emitEventParticipantsUpdated([event.id, externalEventId], response.data)
 
     return response
+  }
+
+  async updateEventParticipant(participantId: string, dto: UpdateEventParticipantDto) {
+    const updatedParticipant = await this.eventRepository.updateParticipant(participantId, dto)
+
+    if (!updatedParticipant) {
+      throw notFound('Участник события не найден')
+    }
+
+    const externalEventId = updatedParticipant.event.externalId ?? updatedParticipant.event.id
+    const participant = mapEventParticipantToParticipant(updatedParticipant, externalEventId)
+    const participants = await this.eventRepository.findParticipantsByEventId(
+      updatedParticipant.event.id,
+    )
+    const eventParticipants = participants.map(participant =>
+      mapEventParticipantToParticipant(participant, externalEventId),
+    )
+    const eventRoomIds = [updatedParticipant.event.id]
+
+    if (updatedParticipant.event.externalId) {
+      eventRoomIds.push(updatedParticipant.event.externalId)
+    }
+
+    emitEventParticipantsUpdated(eventRoomIds, eventParticipants)
+
+    return {
+      data: participant,
+    }
   }
 }
