@@ -1,5 +1,9 @@
-import type { EventParticipant, Prisma } from '@prisma/client'
+import type { EventParticipant, EventParticipantPayment, Prisma } from '@prisma/client'
 import type { ExternalEventDto, Participant } from './event.types'
+
+export type EventParticipantWithPayment = EventParticipant & {
+  payment: EventParticipantPayment | null
+}
 
 function mapExternalEventToPersistenceInput(event: ExternalEventDto) {
   return {
@@ -60,7 +64,7 @@ export function mapExternalParticipantToUpsertInput(
 }
 
 export function mapEventParticipantToParticipant(
-  participant: EventParticipant,
+  participant: EventParticipantWithPayment,
   externalEventId: string,
 ): Participant {
   return {
@@ -84,5 +88,17 @@ export function mapEventParticipantToParticipant(
       createdAt: participant.userCreatedAt.toISOString(),
       updatedAt: participant.userUpdatedAt.toISOString(),
     },
+    payment: participant.payment
+      ? {
+          id: participant.payment.id,
+          participantId: participant.payment.participantId,
+          tournament: participant.payment.tournament,
+          bar: participant.payment.bar,
+          games: participant.payment.games,
+          paid: participant.payment.paid,
+          createdAt: participant.payment.createdAt,
+          updatedAt: participant.payment.updatedAt,
+        }
+      : null,
   }
 }

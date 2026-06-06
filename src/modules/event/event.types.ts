@@ -53,6 +53,17 @@ export interface ParticipantUser {
   updatedAt: string
 }
 
+export interface ParticipantPayment {
+  id: string
+  participantId: string
+  tournament: number
+  bar: number
+  games: number
+  paid: number
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
 export interface Participant {
   id: string
   userId: string
@@ -64,6 +75,7 @@ export interface Participant {
   tableNumber: number
   seatNumber: number
   user: ParticipantUser
+  payment?: ParticipantPayment | null
 }
 
 export interface GetExternalEventParticipantsDto {

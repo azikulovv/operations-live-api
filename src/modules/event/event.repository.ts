@@ -1,6 +1,7 @@
-import type { EventParticipant, PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import type { ExternalEventDto, Participant } from './event.types'
 import {
+  type EventParticipantWithPayment,
   mapExternalEventToCreateInput,
   mapExternalEventToUpdateInput,
   mapExternalParticipantToUpsertInput,
@@ -86,10 +87,13 @@ export class EventRepository {
     })
   }
 
-  async findParticipantsByEventId(eventId: string): Promise<EventParticipant[]> {
+  async findParticipantsByEventId(eventId: string): Promise<EventParticipantWithPayment[]> {
     return this.prisma.eventParticipant.findMany({
       where: {
         eventId,
+      },
+      include: {
+        payment: true,
       },
       orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { createdAt: 'asc' }],
     })
