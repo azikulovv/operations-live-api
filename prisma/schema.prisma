@@ -40,10 +40,38 @@ model Event {
   seatsPerTable      Int?
   tableCount         Int
   registrationsCount Int
+  participants       EventParticipant[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status, startsAt])
   @@map("events")
+}
+
+model EventParticipant {
+  id             String    @id @default(cuid())
+  externalId     String    @unique
+  externalUserId String
+  eventId        String
+  status         String
+  registeredAt   DateTime
+  cancelledAt    DateTime?
+  position       Int?
+  tableNumber    Int?
+  seatNumber     Int?
+  userName       String?
+  userEmail      String?
+  userPhone      String?
+  userTelegramId String?
+  userAvatarUrl  String?
+  badge          String?
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@map("event_participants")
 }

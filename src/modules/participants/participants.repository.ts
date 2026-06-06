@@ -1,0 +1,39 @@
+import type { Prisma, PrismaClient } from '@prisma/client'
+
+export class ParticipantsRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findExternalIds(externalIds: string[]) {
+    if (externalIds.length === 0) return new Set<string>()
+
+    const participants = await this.prisma.eventParticipant.findMany({
+      where: {
+        externalId: {
+          in: externalIds,
+        },
+      },
+      select: {
+        externalId: true,
+      },
+    })
+
+    return new Set(participants.map((participant) => participant.externalId))
+  }
+
+  async createMany(participants: Prisma.EventParticipantCreateManyInput[]) {
+    if (participants.length === 0) return { count: 0 }
+
+    return this.prisma.eventParticipant.createMany({
+      data: participants,
+    })
+  }
+
+  async findByEventId(eventId: string) {
+    return this.prisma.eventParticipant.findMany({
+      where: {
+        eventId,
+      },
+      orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { registeredAt: 'asc' }],
+    })
+  }
+}

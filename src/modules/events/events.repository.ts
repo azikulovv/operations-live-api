@@ -20,11 +20,25 @@ export class EventsRepository {
     return new Set(events.map((event) => event.externalId))
   }
 
+  async findByExternalId(externalId: string) {
+    return this.prisma.event.findUnique({
+      where: {
+        externalId,
+      },
+    })
+  }
+
   async createMany(events: Prisma.EventCreateManyInput[]) {
     if (events.length === 0) return { count: 0 }
 
     return this.prisma.event.createMany({
       data: events,
+    })
+  }
+
+  async create(event: Prisma.EventCreateInput) {
+    return this.prisma.event.create({
+      data: event,
     })
   }
 
