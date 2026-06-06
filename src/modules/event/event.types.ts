@@ -25,3 +25,32 @@ export interface ExternalEventDto {
 export interface GetExternalEventResponse {
   data: ExternalEventDto[] | null
 }
+
+export interface ParticipantUser {
+  id: string
+  avatarUrl: string
+  avatarHash: string
+  email: string
+  username: string
+  phone: string
+  role: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Participant {
+  id: string
+  userId: string
+  eventId: string
+  status: string
+  createdAt: Date | string
+  cancelledAt: Date | string | null
+  position: number | null
+  tableNumber: number
+  seatNumber: number
+  user: ParticipantUser
+}
+
+export interface GetExternalEventParticipantsDto {
+  participants: Participant[]
+}

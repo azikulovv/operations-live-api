@@ -6,4 +6,8 @@ export class EventService {
   async getActiveEvents() {
     return this.eventRepository.findActiveEvents()
   }
+
+  async getEventParticipants(eventId: string) {
+    return this.eventRepository.findEventParticipants(eventId)
+  }
 }
