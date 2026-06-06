@@ -1,8 +1,9 @@
 import type { Request, Response } from 'express'
 import { EventService } from '@/modules/event/event.service'
 import { EventParticipantsQuery } from './event.schemas'
+import { prisma } from '@/database/prisma'
 
-const eventService = new EventService()
+const eventService = new EventService(prisma)
 
 export class EventController {
   async getActiveEvents(_req: Request, res: Response) {

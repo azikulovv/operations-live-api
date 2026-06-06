@@ -10,17 +10,32 @@ export interface ExternalEventDto {
   gameType: string
   startsAt: string
   endsAt: string
-  reminderSent1h: boolean
-  reminderSent10m: boolean
   participantLimit: number
-  seatsPerTable: number
-  pointsForParticipation: number
   status: string
   createdAt: string
   updatedAt: string
   _count: {
     registrations: number
   }
+}
+
+export interface EventItem {
+  id: string
+  imageUrl: string
+  imageHash: string
+  title: string
+  city: string
+  address: string
+  features: string
+  gameRules: string
+  gameType: string
+  startsAt: string
+  endsAt: string
+  participantLimit: number
+  status: string
+  createdAt: string
+  updatedAt: string
+  registrationCount: number
 }
 export interface GetExternalEventResponse {
   data: ExternalEventDto[] | null
