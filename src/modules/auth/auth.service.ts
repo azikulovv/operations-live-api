@@ -36,4 +36,21 @@ export class AuthService {
       accessToken,
     }
   }
+
+  async me(userId: string) {
+    const user = await this.userRepository.findById(userId)
+
+    if (!user) {
+      throw unauthorized('Не удалось найти пользователя')
+    }
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+    }
+  }
 }
