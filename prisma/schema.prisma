@@ -25,3 +25,25 @@ model User {
 
   @@map("users")
 }
+
+model Event {
+  id                 String    @id @default(cuid())
+  externalId         String    @unique
+  title              String
+  city               String
+  address            String
+  gameType           String
+  startsAt           DateTime
+  endsAt             DateTime?
+  status             String
+  participantLimit   Int?
+  seatsPerTable      Int?
+  tableCount         Int
+  registrationsCount Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, startsAt])
+  @@map("events")
+}

@@ -1,0 +1,38 @@
+import type { Prisma, PrismaClient } from '@prisma/client'
+
+export class EventsRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
+  async findExternalIds(externalIds: string[]) {
+    if (externalIds.length === 0) return new Set<string>()
+
+    const events = await this.prisma.event.findMany({
+      where: {
+        externalId: {
+          in: externalIds,
+        },
+      },
+      select: {
+        externalId: true,
+      },
+    })
+
+    return new Set(events.map((event) => event.externalId))
+  }
+
+  async createMany(events: Prisma.EventCreateManyInput[]) {
+    if (events.length === 0) return { count: 0 }
+
+    return this.prisma.event.createMany({
+      data: events,
+    })
+  }
+
+  async findAll() {
+    return this.prisma.event.findMany({
+      orderBy: {
+        startsAt: 'asc',
+      },
+    })
+  }
+}
