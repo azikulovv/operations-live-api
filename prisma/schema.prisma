@@ -67,6 +67,7 @@ model EventParticipant {
   userAvatarUrl  String?
   badge          String?
   promotion      ParticipantPromotion?
+  payment        ParticipantPayment?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -92,4 +93,21 @@ model ParticipantPromotion {
   updatedAt DateTime @updatedAt
 
   @@map("participant_promotions")
+}
+
+model ParticipantPayment {
+  id             String  @id @default(cuid())
+  participantId  String  @unique
+  accruedAmount  Int     @default(0)
+  discountAmount Int     @default(0)
+  paidAmount     Int     @default(0)
+  status         String  @default("UNPAID")
+  comment        String?
+
+  participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("participant_payments")
 }
