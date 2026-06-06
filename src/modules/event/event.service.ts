@@ -3,6 +3,7 @@ import { notFound } from '@/common/errors/app-error'
 import { EventRepository } from './event.repository'
 import { EventExternalClient } from './event.external-client'
 import { mapEventParticipantToParticipant } from './event.mapper'
+import { emitActiveEventsUpdated, emitEventParticipantsUpdated } from './event.realtime'
 
 export class EventService {
   private readonly eventRepository: EventRepository
@@ -16,14 +17,20 @@ export class EventService {
     const externalEvents = await this.eventExternalClient.findActiveEvents()
 
     if (!externalEvents.length) {
-      return this.eventRepository.findAllOrderedByStart()
+      const events = await this.eventRepository.findAllOrderedByStart()
+      emitActiveEventsUpdated(events)
+
+      return events
     }
 
     await this.eventRepository.upsertExternalEvents(externalEvents)
 
     const externalIds = externalEvents.map(event => event.id)
 
-    return this.eventRepository.findByExternalIdsOrdered(externalIds)
+    const events = await this.eventRepository.findByExternalIdsOrdered(externalIds)
+    emitActiveEventsUpdated(events)
+
+    return events
   }
 
   async getEventParticipants(eventId: string) {
@@ -44,10 +51,14 @@ export class EventService {
 
     const participants = await this.eventRepository.findParticipantsByEventId(event.id)
 
-    return {
+    const response = {
       data: participants.map(participant =>
         mapEventParticipantToParticipant(participant, externalEventId),
       ),
     }
+
+    emitEventParticipantsUpdated([event.id, externalEventId], response.data)
+
+    return response
   }
 }

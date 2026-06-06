@@ -2,26 +2,30 @@ import type { Server as HttpServer } from 'node:http'
 import { Server } from 'socket.io'
 
 import { env } from '@/config/env'
-
-export let io: Server
+import { registerEventSocketHandlers } from '@/modules/event/event.realtime'
+import { setSocketServer } from '@/realtime/socket-server'
 
 export function initSocket(server: HttpServer) {
-  io = new Server(server, {
+  const io = new Server(server, {
     cors: {
-      // origin: env.FRONTEND_URL,
+      origin: env.FRONTEND_URL,
       credentials: true,
     },
   })
 
-  io.on('connection', (socket) => {
-    console.log(`🟢 Socket connected: ${socket.id}`)
+  setSocketServer(io)
+
+  io.on('connection', socket => {
+    console.log(`Socket connected: ${socket.id}`)
+
+    registerEventSocketHandlers(socket)
 
     socket.emit('connected', {
       message: 'Realtime подключение активно',
     })
 
     socket.on('disconnect', () => {
-      console.log(`🔴 Socket disconnected: ${socket.id}`)
+      console.log(`Socket disconnected: ${socket.id}`)
     })
   })
 
