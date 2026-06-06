@@ -1,55 +1,23 @@
-import { externalApiRequest } from '@/external/external-api.client'
+import type { EventParticipant, PrismaClient } from '@prisma/client'
+import type { ExternalEventDto, Participant } from './event.types'
 import {
-  GetExternalEventResponse,
-  GetExternalEventParticipantsDto,
-  Participant,
-} from './event.types'
-import { PrismaClient } from '@prisma/client'
-import { mapExternalEventToCreateInput } from './event.mapper'
+  mapExternalEventToCreateInput,
+  mapExternalEventToUpdateInput,
+  mapExternalParticipantToUpsertInput,
+} from './event.mapper'
 
 export class EventRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findMany() {
-    const response = await externalApiRequest<GetExternalEventResponse>('/events/active-now', {
-      method: 'GET',
-    })
-
-    const externalEvents = response.data
-
-    if (!externalEvents?.length) {
-      return this.prisma.event.findMany({
-        orderBy: {
-          startsAt: 'asc',
-        },
-      })
-    }
-
-    const externalIds = externalEvents.map(event => event.id)
-
-    const existingEvents = await this.prisma.event.findMany({
-      where: {
-        externalId: {
-          in: externalIds,
-        },
-      },
-      select: {
-        externalId: true,
+  async findAllOrderedByStart() {
+    return this.prisma.event.findMany({
+      orderBy: {
+        startsAt: 'asc',
       },
     })
+  }
 
-    const existingExternalIds = new Set(
-      existingEvents.map(event => event.externalId).filter(Boolean),
-    )
-
-    const missingEvents = externalEvents.filter(event => !existingExternalIds.has(event.id))
-
-    if (missingEvents.length) {
-      await this.prisma.event.createMany({
-        data: missingEvents.map(event => mapExternalEventToCreateInput(event)),
-      })
-    }
-
+  async findByExternalIdsOrdered(externalIds: string[]) {
     return this.prisma.event.findMany({
       where: {
         externalId: {
@@ -62,13 +30,80 @@ export class EventRepository {
     })
   }
 
-  async findParticipants(eventId: string): Promise<{ data: Participant[] }> {
-    const response = await externalApiRequest<GetExternalEventParticipantsDto>(
-      `/events/${eventId}/participants`,
-      {
-        method: 'GET',
+  async findByIdOrExternalId(eventId: string) {
+    return this.prisma.event.findFirst({
+      where: {
+        OR: [{ externalId: eventId }, { id: eventId }],
       },
+      select: {
+        id: true,
+        externalId: true,
+      },
+    })
+  }
+
+  async upsertExternalEvents(events: ExternalEventDto[]) {
+    await this.prisma.$transaction(
+      events.map(event =>
+        this.prisma.event.upsert({
+          where: {
+            externalId: event.id,
+          },
+          update: mapExternalEventToUpdateInput(event),
+          create: mapExternalEventToCreateInput(event),
+        }),
+      ),
     )
-    return { data: response.participants }
+  }
+
+  async upsertExternalParticipants(eventId: string, participants: Participant[]) {
+    await this.prisma.$transaction(
+      participants.map(participant => {
+        const data = mapExternalParticipantToUpsertInput(participant, eventId)
+
+        return this.prisma.eventParticipant.upsert({
+          where: {
+            externalId: participant.id,
+          },
+          update: data,
+          create: data,
+        })
+      }),
+    )
+  }
+
+  async createMissingParticipantPayments(eventId: string) {
+    const participantsWithoutPayment = await this.findParticipantsWithoutPayment(eventId)
+
+    if (!participantsWithoutPayment.length) {
+      return
+    }
+
+    await this.prisma.eventParticipantPayment.createMany({
+      data: participantsWithoutPayment.map(participant => ({
+        participantId: participant.id,
+      })),
+    })
+  }
+
+  async findParticipantsByEventId(eventId: string): Promise<EventParticipant[]> {
+    return this.prisma.eventParticipant.findMany({
+      where: {
+        eventId,
+      },
+      orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { createdAt: 'asc' }],
+    })
+  }
+
+  private async findParticipantsWithoutPayment(eventId: string) {
+    return this.prisma.eventParticipant.findMany({
+      where: {
+        eventId,
+        payment: null,
+      },
+      select: {
+        id: true,
+      },
+    })
   }
 }

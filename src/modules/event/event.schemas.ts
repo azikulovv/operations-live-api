@@ -1,7 +1,9 @@
 import z from 'zod'
 
-export const eventPariticipantsSchema = z.object({
+export const eventParticipantsQuerySchema = z.object({
   eventId: z.string().min(1),
 })
 
-export type EventParticipantsQuery = z.infer<typeof eventPariticipantsSchema>
+export const eventPariticipantsSchema = eventParticipantsQuerySchema
+
+export type EventParticipantsQuery = z.infer<typeof eventParticipantsQuerySchema>

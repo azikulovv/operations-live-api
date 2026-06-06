@@ -44,5 +44,47 @@ model Event {
   updatedAt         DateTime  @updatedAt
   registrationCount Int
 
-  // registrations EventRegistration[]
+  participants EventParticipant[]
+}
+
+model EventParticipant {
+  id             String    @id @default(cuid())
+  externalId     String    @unique
+  externalUserId String
+  eventId        String
+  event          Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status         String
+  createdAt      DateTime
+  cancelledAt    DateTime?
+  position       Int?
+  tableNumber    Int
+  seatNumber     Int
+  userAvatarUrl  String?
+  userAvatarHash String?
+  userEmail      String
+  userUsername   String
+  userPhone      String
+  userRole       String
+  userCreatedAt  DateTime
+  userUpdatedAt  DateTime
+  userBadge      Int?
+  payment        EventParticipantPayment?
+  updatedAt      DateTime  @updatedAt
+
+  @@index([eventId])
+  @@map("event_participants")
+}
+
+model EventParticipantPayment {
+  id            String           @id @default(cuid())
+  participantId String           @unique
+  participant   EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  tournament    Int              @default(0)
+  bar           Int              @default(0)
+  games         Int              @default(0)
+  paid          Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@map("event_participant_payments")
 }
