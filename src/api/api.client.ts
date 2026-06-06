@@ -7,7 +7,7 @@ type RequestOptions = {
   headers?: Record<string, string>
 }
 
-const externalApi = axios.create({
+const api = axios.create({
   baseURL: env.EXTERNAL_API_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -15,12 +15,9 @@ const externalApi = axios.create({
   },
 })
 
-export async function externalApiRequest<T>(
-  path: string,
-  options: RequestOptions = {},
-): Promise<T> {
+export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   try {
-    const response = await externalApi.request<T>({
+    const response = await api.request<T>({
       url: path,
       method: options.method ?? 'GET',
       data: options.body,
