@@ -5,6 +5,7 @@ import { env } from '@/config/env'
 import { authRoutes } from '@/modules/auth/auth.routes'
 import { eventsRoutes } from '@/modules/events/events.routes'
 import { participantsRoutes } from '@/modules/participants/participants.routes'
+import { eventPromotionsRoutes, promotionsRoutes } from '@/modules/promotions/promotions.routes'
 import { errorMiddleware } from '@/common/middlewares/error.middleware'
 
 export const app = express()
@@ -27,6 +28,8 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/events', eventsRoutes)
+app.use('/api/events/:eventId/promotions', eventPromotionsRoutes)
 app.use('/api/events/:eventId/participants', participantsRoutes)
+app.use('/api/promotions', promotionsRoutes)
 
 app.use(errorMiddleware)
