@@ -10,12 +10,11 @@ export interface ExternalEventDto {
   gameType: string
   startsAt: string
   endsAt: string
-  reminderSent1h: false
-  reminderSent10m: false
+  reminderSent1h: boolean
+  reminderSent10m: boolean
   participantLimit: number
   seatsPerTable: number
   pointsForParticipation: number
-  isTemplate: false
   status: string
   createdAt: string
   updatedAt: string
