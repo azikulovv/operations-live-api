@@ -5,6 +5,7 @@ export const errorMiddleware: ErrorRequestHandler = (error, _req, res, _next) =>
   if (error instanceof AppError) {
     res.status(error.statusCode).json({
       message: error.message,
+      ...(error.details ? { errors: error.details } : {}),
     })
     return
   }
