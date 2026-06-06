@@ -75,6 +75,7 @@ export interface Participant {
   tableNumber: number
   seatNumber: number
   userBadge?: number | null
+  closed: boolean
   user: ParticipantUser
   payment?: ParticipantPayment | null
 }

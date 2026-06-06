@@ -48,11 +48,11 @@ model Event {
 }
 
 model EventParticipant {
-  id             String    @id @default(cuid())
-  externalId     String    @unique
+  id             String                   @id @default(cuid())
+  externalId     String                   @unique
   externalUserId String
   eventId        String
-  event          Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event          Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   status         String
   createdAt      DateTime
   cancelledAt    DateTime?
@@ -68,8 +68,9 @@ model EventParticipant {
   userCreatedAt  DateTime
   userUpdatedAt  DateTime
   userBadge      Int?
+  closed         Boolean                  @default(false)
   payment        EventParticipantPayment?
-  updatedAt      DateTime  @updatedAt
+  updatedAt      DateTime                 @updatedAt
 
   @@index([eventId])
   @@map("event_participants")

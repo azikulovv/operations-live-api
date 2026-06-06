@@ -11,6 +11,7 @@ export const eventParticipantParamsSchema = z.object({
 export const updateEventParticipantSchema = z
   .object({
     userBadge: z.number().int().nonnegative().nullable().optional(),
+    closed: z.boolean().optional(),
     payment: z
       .object({
         tournament: z.number().int().nonnegative().optional(),
@@ -20,9 +21,12 @@ export const updateEventParticipantSchema = z
       })
       .optional(),
   })
-  .refine(dto => dto.userBadge !== undefined || dto.payment !== undefined, {
-    message: 'Нужно передать хотя бы одно поле для обновления',
-  })
+  .refine(
+    dto => dto.userBadge !== undefined || dto.closed !== undefined || dto.payment !== undefined,
+    {
+      message: 'Нужно передать хотя бы одно поле для обновления',
+    },
+  )
 
 export const eventPariticipantsSchema = eventParticipantsQuerySchema
 

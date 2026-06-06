@@ -126,6 +126,17 @@ export class EventRepository {
         })
       }
 
+      if (dto.closed !== undefined) {
+        await tx.eventParticipant.update({
+          where: {
+            id: participant.id,
+          },
+          data: {
+            closed: dto.closed,
+          },
+        })
+      }
+
       if (dto.payment !== undefined) {
         await tx.eventParticipantPayment.upsert({
           where: {
