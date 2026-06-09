@@ -37,6 +37,19 @@ export class PaymentsRepository {
             updatedAt: true,
           },
         },
+        promotion: {
+          select: {
+            id: true,
+            participantId: true,
+            promotionType: true,
+            reason: true,
+            discountPercent: true,
+            used: true,
+            comment: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
       orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { userName: 'asc' }],
     })

@@ -21,6 +21,17 @@ type PaymentListItem = {
     comment: string | null
     updatedAt: Date
   } | null
+  promotion: {
+    id: string
+    participantId: string
+    promotionType: string | null
+    reason: string | null
+    discountPercent: number
+    used: number
+    comment: string | null
+    createdAt: Date | string
+    updatedAt: Date | string
+  } | null
 }
 
 export function presentPaymentListItem(participant: PaymentListItem) {
@@ -54,5 +65,6 @@ export function presentPaymentListItem(participant: PaymentListItem) {
       comment: participant.payment?.comment ?? null,
       updatedAt: participant.payment?.updatedAt ?? null,
     },
+    promotion: participant.promotion,
   }
 }
