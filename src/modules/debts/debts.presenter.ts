@@ -16,6 +16,7 @@ type DebtListItem = {
     id: string
     amount: number
     comment: string | null
+    closed: boolean
     updatedAt: Date
   } | null
 }
@@ -41,6 +42,7 @@ export function presentDebtListItem(participant: DebtListItem) {
       id: participant.debt?.id ?? null,
       amount: participant.debt?.amount ?? 0,
       comment: participant.debt?.comment ?? null,
+      closed: participant.debt?.closed ?? false,
       updatedAt: participant.debt?.updatedAt ?? null,
     },
   }

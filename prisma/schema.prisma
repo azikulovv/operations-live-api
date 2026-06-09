@@ -27,8 +27,8 @@ model User {
 }
 
 model Event {
-  id                 String             @id @default(cuid())
-  externalId         String             @unique
+  id                 String                  @id @default(cuid())
+  externalId         String                  @unique
   title              String
   city               String
   address            String
@@ -52,8 +52,8 @@ model Event {
 }
 
 model EventParticipant {
-  id             String                @id @default(cuid())
-  externalId     String                @unique
+  id             String                    @id @default(cuid())
+  externalId     String                    @unique
   externalUserId String
   eventId        String
   status         String
@@ -85,12 +85,12 @@ model EventParticipant {
 }
 
 model EventTable {
-  id           String @id @default(cuid())
+  id           String  @id @default(cuid())
   eventId      String
   tableNumber  Int
-  playersCount Int    @default(0)
-  maxPlayers   Int    @default(9)
-  status       String @default("NOT_USED")
+  playersCount Int     @default(0)
+  maxPlayers   Int     @default(9)
+  status       String  @default("NOT_USED")
   comment      String?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
@@ -156,6 +156,7 @@ model ParticipantDebt {
   participantId String  @unique
   amount        Int     @default(0)
   comment       String?
+  closed        Boolean @default(false)
 
   participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 

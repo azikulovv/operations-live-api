@@ -11,6 +11,7 @@ export const participantIdParamsSchema = z.object({
 export const updateDebtSchema = z.object({
   amount: z.number().int().min(0).optional(),
   comment: z.string().trim().nullable().optional(),
+  closed: z.boolean().optional(),
 })
 
 export type EventIdParams = z.infer<typeof eventIdParamsSchema>

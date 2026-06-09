@@ -31,6 +31,7 @@ export class DebtsRepository {
             id: true,
             amount: true,
             comment: true,
+            closed: true,
             updatedAt: true,
           },
         },
