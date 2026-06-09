@@ -13,6 +13,7 @@ import { eventFinalTableRoutes, finalTableRoutes } from '@/modules/final-table/f
 import { eventPaymentsRoutes, paymentsRoutes } from '@/modules/payments/payments.routes'
 import { participantsRoutes } from '@/modules/participants/participants.routes'
 import { eventPromotionsRoutes, promotionsRoutes } from '@/modules/promotions/promotions.routes'
+import { eventShiftDashboardRoutes } from '@/modules/shift-dashboard/shift-dashboard.routes'
 import { eventTablesRoutes } from '@/modules/tables/tables.routes'
 import { eventTournamentRoutes, tournamentRoutes } from '@/modules/tournament/tournament.routes'
 import { errorMiddleware } from '@/common/middlewares/error.middleware'
@@ -43,6 +44,7 @@ app.use('/api/events/:eventId/final-table', eventFinalTableRoutes)
 app.use('/api/events/:eventId/payments', eventPaymentsRoutes)
 app.use('/api/events/:eventId/promotions', eventPromotionsRoutes)
 app.use('/api/events/:eventId/participants', participantsRoutes)
+app.use('/api/events/:eventId/shift-dashboard', eventShiftDashboardRoutes)
 app.use('/api/events/:eventId/tables', eventTablesRoutes)
 app.use('/api/events/:eventId/tournament', eventTournamentRoutes)
 app.use('/api/bartender-sales', bartenderSalesRoutes)
