@@ -70,6 +70,7 @@ model EventParticipant {
   payment        ParticipantPayment?
   bartenderSale  ParticipantBartenderSale?
   debt           ParticipantDebt?
+  tournament     ParticipantTournament?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -140,4 +141,21 @@ model ParticipantDebt {
   updatedAt DateTime @updatedAt
 
   @@map("participant_debts")
+}
+
+model ParticipantTournament {
+  id            String @id @default(cuid())
+  participantId String @unique
+  reEntry       Int    @default(0)
+  addon         Int    @default(0)
+  knockouts     Int    @default(0)
+  bustoutOrder  Int    @default(0)
+  status        String @default("ACTIVE")
+
+  participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("participant_tournaments")
 }
