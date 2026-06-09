@@ -17,7 +17,7 @@ export class EventsRepository {
       },
     })
 
-    return new Set(events.map((event) => event.externalId))
+    return new Set(events.map(event => event.externalId))
   }
 
   async findByExternalId(externalId: string) {

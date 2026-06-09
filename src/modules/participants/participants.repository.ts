@@ -17,7 +17,7 @@ export class ParticipantsRepository {
       },
     })
 
-    return new Set(participants.map((participant) => participant.externalId))
+    return new Set(participants.map(participant => participant.externalId))
   }
 
   async createMany(participants: Prisma.EventParticipantCreateManyInput[]) {

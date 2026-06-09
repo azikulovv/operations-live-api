@@ -9,18 +9,12 @@ import {
 } from '@/modules/bartender-sales/bartender-sales.routes'
 import { debtsRoutes, eventDebtsRoutes } from '@/modules/debts/debts.routes'
 import { eventsRoutes } from '@/modules/events/events.routes'
-import {
-  eventFinalTableRoutes,
-  finalTableRoutes,
-} from '@/modules/final-table/final-table.routes'
+import { eventFinalTableRoutes, finalTableRoutes } from '@/modules/final-table/final-table.routes'
 import { eventPaymentsRoutes, paymentsRoutes } from '@/modules/payments/payments.routes'
 import { participantsRoutes } from '@/modules/participants/participants.routes'
 import { eventPromotionsRoutes, promotionsRoutes } from '@/modules/promotions/promotions.routes'
 import { eventTablesRoutes } from '@/modules/tables/tables.routes'
-import {
-  eventTournamentRoutes,
-  tournamentRoutes,
-} from '@/modules/tournament/tournament.routes'
+import { eventTournamentRoutes, tournamentRoutes } from '@/modules/tournament/tournament.routes'
 import { errorMiddleware } from '@/common/middlewares/error.middleware'
 
 export const app = express()

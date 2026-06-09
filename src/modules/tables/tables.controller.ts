@@ -1,10 +1,6 @@
 import type { Request, Response } from 'express'
 
-import type {
-  EventIdParams,
-  TableParams,
-  UpdateTableDto,
-} from '@/modules/tables/tables.schemas'
+import type { EventIdParams, TableParams, UpdateTableDto } from '@/modules/tables/tables.schemas'
 import { TablesService } from '@/modules/tables/tables.service'
 
 const tablesService = new TablesService()

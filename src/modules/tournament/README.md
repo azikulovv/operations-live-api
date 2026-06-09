@@ -11,15 +11,15 @@
 
 ## Файлы модуля
 
-| Файл | Назначение |
-| --- | --- |
-| `tournament.routes.ts` | Роуты Express и подключение Zod-валидации. |
-| `tournament.controller.ts` | HTTP-слой: читает валидированные params/body и возвращает `{ data }`. |
-| `tournament.service.ts` | Бизнес-flow: синхронизация участников, upsert турнирных данных, realtime-уведомления. |
-| `tournament.repository.ts` | Prisma-запросы к `EventParticipant` и `ParticipantTournament`. |
-| `tournament.presenter.ts` | Формат ответа списка для frontend. |
-| `tournament.schemas.ts` | Zod-схемы params/body. |
-| `tournament.realtime.ts` | Socket.IO события модуля. |
+| Файл                       | Назначение                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| `tournament.routes.ts`     | Роуты Express и подключение Zod-валидации.                                            |
+| `tournament.controller.ts` | HTTP-слой: читает валидированные params/body и возвращает `{ data }`.                 |
+| `tournament.service.ts`    | Бизнес-flow: синхронизация участников, upsert турнирных данных, realtime-уведомления. |
+| `tournament.repository.ts` | Prisma-запросы к `EventParticipant` и `ParticipantTournament`.                        |
+| `tournament.presenter.ts`  | Формат ответа списка для frontend.                                                    |
+| `tournament.schemas.ts`    | Zod-схемы params/body.                                                                |
+| `tournament.realtime.ts`   | Socket.IO события модуля.                                                             |
 
 ## Модель данных
 
@@ -42,13 +42,13 @@ model ParticipantTournament {
 
 Поля:
 
-| Поле | Назначение |
-| --- | --- |
-| `reEntry` | Повторный вход после вылета. |
-| `addon` | Дополнительное пополнение/докупка в рамках турнира. |
-| `knockouts` | Сколько игроков этот участник выбил. |
-| `bustoutOrder` | Порядок вылета игрока. |
-| `status` | Текущее состояние игрока, например `ACTIVE` или `BUSTED`. |
+| Поле           | Назначение                                                |
+| -------------- | --------------------------------------------------------- |
+| `reEntry`      | Повторный вход после вылета.                              |
+| `addon`        | Дополнительное пополнение/докупка в рамках турнира.       |
+| `knockouts`    | Сколько игроков этот участник выбил.                      |
+| `bustoutOrder` | Порядок вылета игрока.                                    |
+| `status`       | Текущее состояние игрока, например `ACTIVE` или `BUSTED`. |
 
 ## HTTP API
 
@@ -146,13 +146,13 @@ Body:
 
 Поля body:
 
-| Поле | Тип | Обязательное | Правила |
-| --- | --- | --- | --- |
-| `reEntry` | `number` | Нет | Целое число, минимум `0`. |
-| `addon` | `number` | Нет | Целое число, минимум `0`. |
-| `knockouts` | `number` | Нет | Целое число, минимум `0`. |
-| `bustoutOrder` | `number` | Нет | Целое число, минимум `0`. |
-| `status` | `string` | Нет | Непустая строка после `trim()`. |
+| Поле           | Тип      | Обязательное | Правила                         |
+| -------------- | -------- | ------------ | ------------------------------- |
+| `reEntry`      | `number` | Нет          | Целое число, минимум `0`.       |
+| `addon`        | `number` | Нет          | Целое число, минимум `0`.       |
+| `knockouts`    | `number` | Нет          | Целое число, минимум `0`.       |
+| `bustoutOrder` | `number` | Нет          | Целое число, минимум `0`.       |
+| `status`       | `string` | Нет          | Непустая строка после `trim()`. |
 
 Запрос делает upsert:
 

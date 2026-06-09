@@ -34,8 +34,7 @@ export class TournamentService {
   }
 
   private async findPresentedList(externalEventId: string) {
-    const participants =
-      await this.tournamentRepository.findListByExternalEventId(externalEventId)
+    const participants = await this.tournamentRepository.findListByExternalEventId(externalEventId)
     return participants.map(presentTournamentListItem)
   }
 }

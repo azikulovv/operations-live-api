@@ -22,12 +22,12 @@ export class ParticipantsService {
     const event = await this.findOrCreateEvent(response.event)
     const externalParticipants = this.uniqueByExternalId(response.participants)
     const existingExternalIds = await this.participantsRepository.findExternalIds(
-      externalParticipants.map((participant) => participant.id),
+      externalParticipants.map(participant => participant.id),
     )
 
     const participantsToCreate = externalParticipants
-      .filter((participant) => !existingExternalIds.has(participant.id))
-      .map((participant) => mapExternalParticipantToCreateInput(participant, event.id))
+      .filter(participant => !existingExternalIds.has(participant.id))
+      .map(participant => mapExternalParticipantToCreateInput(participant, event.id))
 
     const result = await this.participantsRepository.createMany(participantsToCreate)
 
@@ -39,10 +39,14 @@ export class ParticipantsService {
   }
 
   private uniqueByExternalId(participants: ExternalParticipant[]) {
-    return Array.from(new Map(participants.map((participant) => [participant.id, participant])).values())
+    return Array.from(
+      new Map(participants.map(participant => [participant.id, participant])).values(),
+    )
   }
 
-  private async findOrCreateEvent(externalEvent: Parameters<typeof mapExternalEventToCreateInput>[0]) {
+  private async findOrCreateEvent(
+    externalEvent: Parameters<typeof mapExternalEventToCreateInput>[0],
+  ) {
     const event = await this.eventsRepository.findByExternalId(externalEvent.id)
     if (event) return event
 

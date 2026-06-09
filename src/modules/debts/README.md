@@ -12,15 +12,15 @@
 
 ## Файлы модуля
 
-| Файл | Назначение |
-| --- | --- |
-| `debts.routes.ts` | Роуты Express и подключение Zod-валидации. |
-| `debts.controller.ts` | HTTP-слой: читает валидированные params/body и возвращает `{ data }`. |
-| `debts.service.ts` | Бизнес-flow: синхронизация участников, upsert долга, realtime-уведомления. |
-| `debts.repository.ts` | Prisma-запросы к `EventParticipant` и `ParticipantDebt`. |
-| `debts.presenter.ts` | Формат ответа списка для frontend. |
-| `debts.schemas.ts` | Zod-схемы params/body. |
-| `debts.realtime.ts` | Socket.IO события модуля. |
+| Файл                  | Назначение                                                                 |
+| --------------------- | -------------------------------------------------------------------------- |
+| `debts.routes.ts`     | Роуты Express и подключение Zod-валидации.                                 |
+| `debts.controller.ts` | HTTP-слой: читает валидированные params/body и возвращает `{ data }`.      |
+| `debts.service.ts`    | Бизнес-flow: синхронизация участников, upsert долга, realtime-уведомления. |
+| `debts.repository.ts` | Prisma-запросы к `EventParticipant` и `ParticipantDebt`.                   |
+| `debts.presenter.ts`  | Формат ответа списка для frontend.                                         |
+| `debts.schemas.ts`    | Zod-схемы params/body.                                                     |
+| `debts.realtime.ts`   | Socket.IO события модуля.                                                  |
 
 ## Модель данных
 
@@ -138,10 +138,10 @@ Body:
 
 Поля body:
 
-| Поле | Тип | Обязательное | Правила |
-| --- | --- | --- | --- |
-| `amount` | `number` | Нет | Целое число, минимум `0`. |
-| `comment` | `string \| null` | Нет | Строка обрезается через `trim()`, можно передать `null`. |
+| Поле      | Тип              | Обязательное | Правила                                                  |
+| --------- | ---------------- | ------------ | -------------------------------------------------------- |
+| `amount`  | `number`         | Нет          | Целое число, минимум `0`.                                |
+| `comment` | `string \| null` | Нет          | Строка обрезается через `trim()`, можно передать `null`. |
 
 Body может содержать одно поле, оба поля или быть пустым объектом. Запрос делает upsert:
 
