@@ -27,7 +27,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     return response.data
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(`External API error: ${error.response?.status ?? 'NO_RESPONSE'}`)
+      throw new Error(`External API error: ${error.response?.status ?? 'NO_RESPONSE'}`, {
+        cause: error,
+      })
     }
 
     throw error
