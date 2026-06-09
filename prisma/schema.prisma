@@ -69,6 +69,7 @@ model EventParticipant {
   promotion      ParticipantPromotion?
   payment        ParticipantPayment?
   bartenderSale  ParticipantBartenderSale?
+  debt           ParticipantDebt?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -125,4 +126,18 @@ model ParticipantBartenderSale {
   updatedAt DateTime @updatedAt
 
   @@map("participant_bartender_sales")
+}
+
+model ParticipantDebt {
+  id            String  @id @default(cuid())
+  participantId String  @unique
+  amount        Int     @default(0)
+  comment       String?
+
+  participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("participant_debts")
 }
