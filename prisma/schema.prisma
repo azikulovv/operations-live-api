@@ -42,6 +42,7 @@ model Event {
   registrationsCount Int
   participants       EventParticipant[]
   tables             EventTable[]
+  finalTablePlayers  ParticipantFinalTable[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -72,6 +73,7 @@ model EventParticipant {
   bartenderSale  ParticipantBartenderSale?
   debt           ParticipantDebt?
   tournament     ParticipantTournament?
+  finalTable     ParticipantFinalTable?
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
@@ -178,4 +180,22 @@ model ParticipantTournament {
   updatedAt DateTime @updatedAt
 
   @@map("participant_tournaments")
+}
+
+model ParticipantFinalTable {
+  id            String @id @default(cuid())
+  eventId       String
+  participantId String @unique
+  seat          Int
+  stack         Int    @default(0)
+
+  event       Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([eventId, seat])
+  @@index([eventId])
+  @@map("participant_final_tables")
 }
