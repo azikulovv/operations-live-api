@@ -33,6 +33,13 @@ export class ParticipantsRepository {
       where: {
         eventId,
       },
+      include: {
+        bartenderSale: true,
+        promotion: true,
+        debt: true,
+        payment: true,
+        tournament: true,
+      },
       orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { registeredAt: 'asc' }],
     })
   }
