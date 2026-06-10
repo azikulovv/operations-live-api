@@ -6,6 +6,11 @@ import { EventsRepository } from '@/modules/events/events.repository'
 import { fetchEventParticipants } from '@/modules/participants/participants.external-client'
 import { mapExternalParticipantToCreateInput } from '@/modules/participants/participants.mapper'
 import { ParticipantsRepository } from '@/modules/participants/participants.repository'
+import {
+  emitParticipantListUpdated,
+  emitParticipantUpdated,
+} from '@/modules/participants/participants.realtime'
+import type { UpdateParticipantDto } from '@/modules/participants/participants.schemas'
 import type { ExternalParticipant } from '@/modules/participants/participants.types'
 
 export class ParticipantsService {
@@ -36,6 +41,25 @@ export class ParticipantsService {
       created: result.count,
       skipped: externalParticipants.length - result.count,
     }
+  }
+
+  async updateParticipant(participantId: string, dto: UpdateParticipantDto) {
+    const participant = await this.participantsRepository.updateByParticipantId(
+      participantId,
+      dto,
+    )
+    const eventId = participant.event.externalId
+    const list = await this.participantsRepository.findByEventId(participant.event.id)
+
+    emitParticipantUpdated({
+      eventId,
+      participantId,
+      participant,
+    })
+
+    emitParticipantListUpdated(eventId, list)
+
+    return participant
   }
 
   private uniqueByExternalId(participants: ExternalParticipant[]) {

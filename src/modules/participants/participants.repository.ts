@@ -1,5 +1,7 @@
 import type { Prisma, PrismaClient } from '@prisma/client'
 
+import type { UpdateParticipantDto } from '@/modules/participants/participants.schemas'
+
 export class ParticipantsRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -41,6 +43,28 @@ export class ParticipantsRepository {
         tournament: true,
       },
       orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { registeredAt: 'asc' }],
+    })
+  }
+
+  async updateByParticipantId(participantId: string, dto: UpdateParticipantDto) {
+    return this.prisma.eventParticipant.update({
+      where: {
+        id: participantId,
+      },
+      data: dto,
+      include: {
+        event: {
+          select: {
+            id: true,
+            externalId: true,
+          },
+        },
+        bartenderSale: true,
+        promotion: true,
+        debt: true,
+        payment: true,
+        tournament: true,
+      },
     })
   }
 }
