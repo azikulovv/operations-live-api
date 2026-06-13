@@ -9,6 +9,7 @@ export class TournamentRepository {
     return this.prisma.eventParticipant.findMany({
       where: {
         arrived: true,
+        AND: [{ badge: { not: null } }, { badge: { not: '' } }],
         status: {
           not: 'CANCELLED',
         },

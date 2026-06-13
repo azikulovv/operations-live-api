@@ -3,8 +3,20 @@ import type { Prisma } from '@prisma/client'
 import { isExternalApiError } from '@/api/api.client'
 import { badRequest, notFound } from '@/common/errors/app-error'
 import { prisma } from '@/database/prisma'
+import { presentBartenderSaleListItem } from '@/modules/bartender-sales/bartender-sales.presenter'
+import { emitBartenderSaleListUpdated } from '@/modules/bartender-sales/bartender-sales.realtime'
+import { BartenderSalesRepository } from '@/modules/bartender-sales/bartender-sales.repository'
+import { presentDebtListItem } from '@/modules/debts/debts.presenter'
+import { emitDebtListUpdated } from '@/modules/debts/debts.realtime'
+import { DebtsRepository } from '@/modules/debts/debts.repository'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
+import { presentFinalTableListItem } from '@/modules/final-table/final-table.presenter'
+import { emitFinalTableListUpdated } from '@/modules/final-table/final-table.realtime'
+import { FinalTableRepository } from '@/modules/final-table/final-table.repository'
+import { presentPaymentListItem } from '@/modules/payments/payments.presenter'
+import { emitPaymentListUpdated } from '@/modules/payments/payments.realtime'
+import { PaymentsRepository } from '@/modules/payments/payments.repository'
 import { fetchEventParticipants } from '@/modules/participants/participants.external-client'
 import {
   mapExternalParticipantToCreateInput,
@@ -17,10 +29,22 @@ import {
 } from '@/modules/participants/participants.realtime'
 import type { UpdateParticipantDto } from '@/modules/participants/participants.schemas'
 import type { ExternalParticipant } from '@/modules/participants/participants.types'
+import { presentPromotionListItem } from '@/modules/promotions/promotions.presenter'
+import { emitPromotionListUpdated } from '@/modules/promotions/promotions.realtime'
+import { PromotionsRepository } from '@/modules/promotions/promotions.repository'
+import { presentTournamentListItem } from '@/modules/tournament/tournament.presenter'
+import { emitTournamentListUpdated } from '@/modules/tournament/tournament.realtime'
+import { TournamentRepository } from '@/modules/tournament/tournament.repository'
 
 export class ParticipantsService {
   private readonly eventsRepository = new EventsRepository(prisma)
   private readonly participantsRepository = new ParticipantsRepository(prisma)
+  private readonly bartenderSalesRepository = new BartenderSalesRepository(prisma)
+  private readonly debtsRepository = new DebtsRepository(prisma)
+  private readonly finalTableRepository = new FinalTableRepository(prisma)
+  private readonly paymentsRepository = new PaymentsRepository(prisma)
+  private readonly promotionsRepository = new PromotionsRepository(prisma)
+  private readonly tournamentRepository = new TournamentRepository(prisma)
 
   async getEventParticipants(externalEventId: string) {
     const event = await this.syncEventParticipantsIfAvailable(externalEventId)
@@ -102,6 +126,7 @@ export class ParticipantsService {
     })
 
     emitParticipantListUpdated(eventId, list)
+    await this.emitOperationalListsUpdated(eventId)
 
     return participant
   }
@@ -116,6 +141,25 @@ export class ParticipantsService {
     if (participant.status.toUpperCase() === 'CANCELLED') {
       throw badRequest('Нельзя изменить данные отмененного участника')
     }
+  }
+
+  private async emitOperationalListsUpdated(eventId: string) {
+    const [bartenderSales, debts, finalTable, payments, promotions, tournament] =
+      await Promise.all([
+        this.bartenderSalesRepository.findListByExternalEventId(eventId),
+        this.debtsRepository.findListByExternalEventId(eventId),
+        this.finalTableRepository.findListByExternalEventId(eventId),
+        this.paymentsRepository.findListByExternalEventId(eventId),
+        this.promotionsRepository.findListByExternalEventId(eventId),
+        this.tournamentRepository.findListByExternalEventId(eventId),
+      ])
+
+    emitBartenderSaleListUpdated(eventId, bartenderSales.map(presentBartenderSaleListItem))
+    emitDebtListUpdated(eventId, debts.map(presentDebtListItem))
+    emitFinalTableListUpdated(eventId, finalTable.map(presentFinalTableListItem))
+    emitPaymentListUpdated(eventId, payments.map(presentPaymentListItem))
+    emitPromotionListUpdated(eventId, promotions.map(presentPromotionListItem))
+    emitTournamentListUpdated(eventId, tournament.map(presentTournamentListItem))
   }
 
   private uniqueByExternalId(participants: ExternalParticipant[]) {

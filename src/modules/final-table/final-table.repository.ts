@@ -35,6 +35,7 @@ export class FinalTableRepository {
         },
         participant: {
           arrived: true,
+          AND: [{ badge: { not: null } }, { badge: { not: '' } }],
           status: {
             not: 'CANCELLED',
           },
