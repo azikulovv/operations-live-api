@@ -13,7 +13,7 @@ export class BartenderSalesService {
   private readonly bartenderSalesRepository = new BartenderSalesRepository(prisma)
 
   async getEventBartenderSales(externalEventId: string) {
-    await this.participantsService.syncEventParticipants(externalEventId)
+    await this.participantsService.syncEventParticipantsIfAvailable(externalEventId)
     return this.findPresentedList(externalEventId)
   }
 

@@ -10,7 +10,7 @@ export class PaymentsService {
   private readonly paymentsRepository = new PaymentsRepository(prisma)
 
   async getEventPayments(externalEventId: string) {
-    await this.participantsService.syncEventParticipants(externalEventId)
+    await this.participantsService.syncEventParticipantsIfAvailable(externalEventId)
     return this.findPresentedList(externalEventId)
   }
 

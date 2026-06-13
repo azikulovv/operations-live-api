@@ -8,7 +8,7 @@ export class ShiftDashboardService {
   private readonly shiftDashboardRepository = new ShiftDashboardRepository(prisma)
 
   async getEventShiftDashboard(externalEventId: string) {
-    await this.participantsService.syncEventParticipants(externalEventId)
+    await this.participantsService.syncEventParticipantsIfAvailable(externalEventId)
 
     const participants =
       await this.shiftDashboardRepository.findParticipantsByExternalEventId(externalEventId)

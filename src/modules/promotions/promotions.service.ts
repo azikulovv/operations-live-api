@@ -13,7 +13,7 @@ export class PromotionsService {
   private readonly promotionsRepository = new PromotionsRepository(prisma)
 
   async getEventPromotions(externalEventId: string) {
-    await this.participantsService.syncEventParticipants(externalEventId)
+    await this.participantsService.syncEventParticipantsIfAvailable(externalEventId)
     return this.findPresentedList(externalEventId)
   }
 

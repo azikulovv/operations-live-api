@@ -20,9 +20,13 @@ export class ParticipantsService {
   private readonly participantsRepository = new ParticipantsRepository(prisma)
 
   async getEventParticipants(externalEventId: string) {
+    const event = await this.syncEventParticipantsIfAvailable(externalEventId)
+    return this.participantsRepository.findByEventId(event.id)
+  }
+
+  async syncEventParticipantsIfAvailable(externalEventId: string) {
     try {
-      const event = await this.syncEventParticipants(externalEventId)
-      return this.participantsRepository.findByEventId(event.id)
+      return await this.syncEventParticipants(externalEventId)
     } catch (error) {
       if (!isExternalApiError(error) || error.statusCode !== 404) {
         throw error
@@ -33,7 +37,11 @@ export class ParticipantsService {
         throw notFound('Событие не найдено')
       }
 
-      return this.participantsRepository.findByEventId(event.id)
+      return {
+        id: event.id,
+        created: 0,
+        skipped: 0,
+      }
     }
   }
 
