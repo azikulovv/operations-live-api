@@ -18,6 +18,8 @@ export class BartenderSalesService {
   }
 
   async updateParticipantBartenderSale(participantId: string, dto: UpdateBartenderSaleDto) {
+    await this.participantsService.ensureParticipantCanBeEdited(participantId)
+
     const bartenderSale = await this.bartenderSalesRepository.upsertByParticipantId(
       participantId,
       dto,

@@ -15,6 +15,8 @@ export class DebtsService {
   }
 
   async updateParticipantDebt(participantId: string, dto: UpdateDebtDto) {
+    await this.participantsService.ensureParticipantCanBeEdited(participantId)
+
     const debt = await this.debtsRepository.upsertByParticipantId(participantId, dto)
     const eventId = debt.participant.event.externalId
     const list = await this.findPresentedList(eventId)

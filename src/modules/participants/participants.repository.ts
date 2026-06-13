@@ -88,6 +88,18 @@ export class ParticipantsRepository {
     })
   }
 
+  async findStatusByParticipantId(participantId: string) {
+    return this.prisma.eventParticipant.findUnique({
+      where: {
+        id: participantId,
+      },
+      select: {
+        id: true,
+        status: true,
+      },
+    })
+  }
+
   async updateByParticipantId(participantId: string, dto: UpdateParticipantDto) {
     return this.prisma.eventParticipant.update({
       where: {

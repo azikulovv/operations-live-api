@@ -15,6 +15,7 @@ export class FinalTableRepository {
         eventId: true,
         externalId: true,
         externalUserId: true,
+        status: true,
         userName: true,
         badge: true,
         event: {
@@ -34,6 +35,9 @@ export class FinalTableRepository {
         },
         participant: {
           arrived: true,
+          status: {
+            not: 'CANCELLED',
+          },
         },
       },
       include: {

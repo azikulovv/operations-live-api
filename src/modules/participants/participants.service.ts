@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 import { isExternalApiError } from '@/api/api.client'
-import { notFound } from '@/common/errors/app-error'
+import { badRequest, notFound } from '@/common/errors/app-error'
 import { prisma } from '@/database/prisma'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
@@ -86,6 +86,8 @@ export class ParticipantsService {
   }
 
   async updateParticipant(participantId: string, dto: UpdateParticipantDto) {
+    await this.ensureParticipantCanBeEdited(participantId)
+
     const participant = await this.participantsRepository.updateByParticipantId(
       participantId,
       dto,
@@ -102,6 +104,18 @@ export class ParticipantsService {
     emitParticipantListUpdated(eventId, list)
 
     return participant
+  }
+
+  async ensureParticipantCanBeEdited(participantId: string) {
+    const participant = await this.participantsRepository.findStatusByParticipantId(participantId)
+
+    if (!participant) {
+      throw notFound('Участник не найден')
+    }
+
+    if (participant.status.toUpperCase() === 'CANCELLED') {
+      throw badRequest('Нельзя изменить данные отмененного участника')
+    }
   }
 
   private uniqueByExternalId(participants: ExternalParticipant[]) {

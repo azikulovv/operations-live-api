@@ -15,6 +15,8 @@ export class PaymentsService {
   }
 
   async updateParticipantPayment(participantId: string, dto: UpdatePaymentDto) {
+    await this.participantsService.ensureParticipantCanBeEdited(participantId)
+
     const payment = await this.paymentsRepository.upsertByParticipantId(participantId, dto)
     const eventId = payment.participant.event.externalId
     const list = await this.findPresentedList(eventId)

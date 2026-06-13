@@ -22,6 +22,10 @@ export class FinalTableService {
       throw badRequest('Участник не найден')
     }
 
+    if (participant.status.toUpperCase() === 'CANCELLED') {
+      throw badRequest('Нельзя изменить данные отмененного участника')
+    }
+
     const finalTable = await this.finalTableRepository.upsertByParticipantId(
       participantId,
       participant.eventId,

@@ -7,6 +7,9 @@ export class ShiftDashboardRepository {
     return this.prisma.eventParticipant.findMany({
       where: {
         arrived: true,
+        status: {
+          not: 'CANCELLED',
+        },
         event: {
           externalId: externalEventId,
         },

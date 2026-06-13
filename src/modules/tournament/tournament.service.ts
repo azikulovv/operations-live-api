@@ -18,6 +18,8 @@ export class TournamentService {
   }
 
   async updateParticipantTournament(participantId: string, dto: UpdateTournamentDto) {
+    await this.participantsService.ensureParticipantCanBeEdited(participantId)
+
     const tournament = await this.tournamentRepository.upsertByParticipantId(participantId, dto)
     const eventId = tournament.participant.event.externalId
     const list = await this.findPresentedList(eventId)
