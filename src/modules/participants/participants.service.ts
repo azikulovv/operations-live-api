@@ -6,7 +6,10 @@ import { prisma } from '@/database/prisma'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
 import { fetchEventParticipants } from '@/modules/participants/participants.external-client'
-import { mapExternalParticipantToCreateInput } from '@/modules/participants/participants.mapper'
+import {
+  mapExternalParticipantToCreateInput,
+  mapExternalParticipantToSyncUpdateInput,
+} from '@/modules/participants/participants.mapper'
 import { ParticipantsRepository } from '@/modules/participants/participants.repository'
 import {
   emitParticipantListUpdated,
@@ -49,20 +52,36 @@ export class ParticipantsService {
     const response = await fetchEventParticipants(externalEventId)
     const event = await this.findOrCreateEvent(response.event)
     const externalParticipants = this.uniqueByExternalId(response.participants)
+    const externalParticipantIds = externalParticipants.map(participant => participant.id)
     const existingExternalIds = await this.participantsRepository.findExternalIds(
-      externalParticipants.map(participant => participant.id),
+      externalParticipantIds,
     )
 
     const participantsToCreate = externalParticipants
       .filter(participant => !existingExternalIds.has(participant.id))
       .map(participant => mapExternalParticipantToCreateInput(participant, event.id))
+    const participantsToUpdate = externalParticipants
+      .filter(participant => existingExternalIds.has(participant.id))
+      .map(participant => ({
+        externalId: participant.id,
+        data: mapExternalParticipantToSyncUpdateInput(participant),
+      }))
 
-    const result = await this.participantsRepository.createMany(participantsToCreate)
+    const [createResult, updateResult, cancelResult] = await Promise.all([
+      this.participantsRepository.createMany(participantsToCreate),
+      this.participantsRepository.updateExternalSyncFields(participantsToUpdate),
+      this.participantsRepository.markMissingExternalIdsAsCancelled(
+        event.id,
+        externalParticipantIds,
+      ),
+    ])
 
     return {
       id: event.id,
-      created: result.count,
-      skipped: externalParticipants.length - result.count,
+      created: createResult.count,
+      updated: updateResult.count,
+      cancelled: cancelResult.count,
+      skipped: externalParticipants.length - createResult.count - updateResult.count,
     }
   }
 

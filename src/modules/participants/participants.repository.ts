@@ -30,6 +30,48 @@ export class ParticipantsRepository {
     })
   }
 
+  async updateExternalSyncFields(
+    participants: Array<{
+      externalId: string
+      data: Prisma.EventParticipantUpdateManyMutationInput
+    }>,
+  ) {
+    if (participants.length === 0) return { count: 0 }
+
+    const updates = participants.map(participant =>
+      this.prisma.eventParticipant.updateMany({
+        where: {
+          externalId: participant.externalId,
+        },
+        data: participant.data,
+      }),
+    )
+
+    const results = await this.prisma.$transaction(updates)
+
+    return {
+      count: results.reduce((total, result) => total + result.count, 0),
+    }
+  }
+
+  async markMissingExternalIdsAsCancelled(eventId: string, externalIds: string[]) {
+    return this.prisma.eventParticipant.updateMany({
+      where: {
+        eventId,
+        externalId: {
+          notIn: externalIds,
+        },
+        status: {
+          not: 'CANCELLED',
+        },
+      },
+      data: {
+        status: 'CANCELLED',
+        cancelledAt: new Date(),
+      },
+    })
+  }
+
   async findByEventId(eventId: string) {
     return this.prisma.eventParticipant.findMany({
       where: {
