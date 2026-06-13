@@ -68,6 +68,7 @@ model EventParticipant {
   userTelegramId String?
   userAvatarUrl  String?
   badge          String?
+  arrived        Boolean                   @default(false)
   promotion      ParticipantPromotion?
   payment        ParticipantPayment?
   bartenderSale  ParticipantBartenderSale?

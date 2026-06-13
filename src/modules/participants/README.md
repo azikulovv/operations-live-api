@@ -41,7 +41,8 @@ Body:
   "badge": "42",
   "tableNumber": 1,
   "seatNumber": 3,
-  "userName": "player_one"
+  "userName": "player_one",
+  "arrived": true
 }
 ```
 
@@ -59,6 +60,7 @@ Body:
 | `userTelegramId` | `string \| null` | Нет |
 | `userAvatarUrl` | `string \| null` | Нет |
 | `badge` | `string \| null` | Нет |
+| `arrived` | `boolean` | Нет |
 
 ## Realtime
 

@@ -21,6 +21,7 @@ export const updateParticipantSchema = z.object({
   userTelegramId: z.string().trim().nullable().optional(),
   userAvatarUrl: z.string().trim().url().nullable().optional(),
   badge: z.string().trim().nullable().optional(),
+  arrived: z.boolean().optional(),
 })
 
 export type EventIdParams = z.infer<typeof eventIdParamsSchema>
