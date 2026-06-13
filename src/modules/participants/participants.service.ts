@@ -1,5 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
+import { isExternalApiError } from '@/api/api.client'
+import { notFound } from '@/common/errors/app-error'
 import { prisma } from '@/database/prisma'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
@@ -18,8 +20,21 @@ export class ParticipantsService {
   private readonly participantsRepository = new ParticipantsRepository(prisma)
 
   async getEventParticipants(externalEventId: string) {
-    const event = await this.syncEventParticipants(externalEventId)
-    return this.participantsRepository.findByEventId(event.id)
+    try {
+      const event = await this.syncEventParticipants(externalEventId)
+      return this.participantsRepository.findByEventId(event.id)
+    } catch (error) {
+      if (!isExternalApiError(error) || error.statusCode !== 404) {
+        throw error
+      }
+
+      const event = await this.eventsRepository.findByExternalId(externalEventId)
+      if (!event) {
+        throw notFound('Событие не найдено')
+      }
+
+      return this.participantsRepository.findByEventId(event.id)
+    }
   }
 
   async syncEventParticipants(externalEventId: string) {

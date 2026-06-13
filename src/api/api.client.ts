@@ -15,6 +15,19 @@ const api = axios.create({
   },
 })
 
+export class ExternalApiError extends Error {
+  constructor(
+    public readonly statusCode: number | null,
+    public readonly path: string,
+  ) {
+    super(`External API error: ${statusCode ?? 'NO_RESPONSE'}`)
+  }
+}
+
+export function isExternalApiError(error: unknown): error is ExternalApiError {
+  return error instanceof ExternalApiError
+}
+
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   try {
     const response = await api.request<T>({
@@ -27,9 +40,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     return response.data
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(`External API error: ${error.response?.status ?? 'NO_RESPONSE'}`, {
-        cause: error,
-      })
+      throw new ExternalApiError(error.response?.status ?? null, path)
     }
 
     throw error
