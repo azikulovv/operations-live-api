@@ -6,6 +6,7 @@ export class ShiftDashboardRepository {
   async findParticipantsByExternalEventId(externalEventId: string) {
     return this.prisma.eventParticipant.findMany({
       where: {
+        arrived: true,
         event: {
           externalId: externalEventId,
         },

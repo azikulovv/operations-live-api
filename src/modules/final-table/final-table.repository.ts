@@ -32,6 +32,9 @@ export class FinalTableRepository {
         event: {
           externalId: externalEventId,
         },
+        participant: {
+          arrived: true,
+        },
       },
       include: {
         participant: {

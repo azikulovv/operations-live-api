@@ -8,6 +8,7 @@ export class TournamentRepository {
   async findListByExternalEventId(externalEventId: string) {
     return this.prisma.eventParticipant.findMany({
       where: {
+        arrived: true,
         event: {
           externalId: externalEventId,
         },

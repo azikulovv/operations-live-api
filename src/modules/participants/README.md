@@ -62,6 +62,11 @@ Body:
 | `badge` | `string \| null` | Нет |
 | `arrived` | `boolean` | Нет |
 
+`arrived` управляет присутствием участника в операционных разделах. Участники с
+`arrived: false` остаются в списке участников события, но не отображаются в
+остальных списках события: оплаты, долги, промо, бар, турнир, финальный стол и
+shift dashboard.
+
 ## Realtime
 
 После успешного `PATCH /api/events/:eventId/participants/:participantId` отправляются события:
