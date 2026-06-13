@@ -1,8 +1,8 @@
 import { prisma } from '@/database/prisma'
-import { fetchActiveEvents } from '@/modules/events/events.external-client'
+import { fetchActiveEvents, fetchUpcomingEvents } from '@/modules/events/events.external-client'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
-import type { ExternalEvent } from '@/modules/events/events.types'
+import type { ActiveEventsResponse, ExternalEvent } from '@/modules/events/events.types'
 
 export class EventsService {
   private readonly eventsRepository = new EventsRepository(prisma)
@@ -13,7 +13,20 @@ export class EventsService {
   }
 
   async syncActiveEvents() {
-    const response = await fetchActiveEvents()
+    return this.syncEvents(fetchActiveEvents)
+  }
+
+  async getUpcomingEvents() {
+    await this.syncUpcomingEvents()
+    return this.eventsRepository.findUpcoming(new Date())
+  }
+
+  async syncUpcomingEvents() {
+    return this.syncEvents(fetchUpcomingEvents)
+  }
+
+  private async syncEvents(fetchEvents: () => Promise<ActiveEventsResponse>) {
+    const response = await fetchEvents()
     const externalEvents = this.uniqueByExternalId(response.data)
     const existingExternalIds = await this.eventsRepository.findExternalIds(
       externalEvents.map(event => event.id),

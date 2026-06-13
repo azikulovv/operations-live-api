@@ -18,3 +18,7 @@ export type ExternalEvent = {
 export type ActiveEventsResponse = {
   data: ExternalEvent[]
 }
+
+export type UpcomingEventsResponse = {
+  data: ExternalEvent[]
+}

@@ -49,4 +49,17 @@ export class EventsRepository {
       },
     })
   }
+
+  async findUpcoming(from: Date) {
+    return this.prisma.event.findMany({
+      where: {
+        startsAt: {
+          gte: from,
+        },
+      },
+      orderBy: {
+        startsAt: 'asc',
+      },
+    })
+  }
 }
