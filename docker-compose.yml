@@ -6,11 +6,11 @@ services:
     container_name: operations-live-backend
     restart: unless-stopped
     ports:
-      - '${PORT:-5000}:5000'
+      - '${PORT:-3003}:3003'
     environment:
       NODE_ENV: production
-      PORT: 5000
-      BACKEND_URL: ${BACKEND_URL:-http://localhost:5000}
+      PORT: 3003
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3003}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       DATABASE_URL: ${DATABASE_URL:-file:/app/data/operations-live.db}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required and must be at least 32 characters}
@@ -23,7 +23,7 @@ services:
       test:
         [
           'CMD-SHELL',
-          'node -e "fetch(''http://127.0.0.1:5000/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+          'node -e "fetch(''http://127.0.0.1:3003/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
         ]
       interval: 30s
       timeout: 5s
