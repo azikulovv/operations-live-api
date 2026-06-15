@@ -37,7 +37,7 @@ cp .env.example .env
 NODE_ENV=development
 PORT=5000
 
-APP_URL=http://localhost:5000
+BACKEND_URL=http://localhost:5000
 FRONTEND_URL=http://localhost:3000
 
 DATABASE_URL="file:./prisma/dev.db"
@@ -82,6 +82,56 @@ http://localhost:5000
 
 ```bash
 curl http://localhost:5000/health
+```
+
+---
+
+## Запуск на сервере через Docker
+
+Создай `.env` файл на сервере:
+
+```bash
+cp .env.example .env
+```
+
+Для Docker рекомендуется оставить БД в volume:
+
+```env
+NODE_ENV=production
+PORT=5000
+BACKEND_URL=http://your-server:5000
+FRONTEND_URL=http://your-frontend:3000
+DATABASE_URL=file:/app/data/operations-live.db
+JWT_SECRET=change_me_to_long_random_secret_at_least_32_chars
+JWT_EXPIRES_IN=7d
+EXTERNAL_API_URL=https://example.com/api
+EXTERNAL_API_KEY=change_me
+```
+
+Запуск:
+
+```bash
+docker compose up -d --build
+```
+
+При старте контейнер автоматически выполняет:
+
+```bash
+npx prisma migrate deploy
+```
+
+SQLite база хранится в named volume `operations_live_sqlite`, который подключен в контейнер как `/app/data`. При обновлении образа или пересоздании контейнера данные не стираются. Не удаляй volume командой `docker compose down -v`, если нужно сохранить БД.
+
+Проверка:
+
+```bash
+curl http://localhost:5000/health
+```
+
+Просмотр логов:
+
+```bash
+docker compose logs -f backend
 ```
 
 ---
@@ -169,6 +219,12 @@ npm run prisma:migrate
 ```
 
 Создаёт и применяет миграции базы данных.
+
+```bash
+npm run prisma:migrate:deploy
+```
+
+Применяет миграции в production без создания новых migration-файлов.
 
 ```bash
 npm run prisma:studio

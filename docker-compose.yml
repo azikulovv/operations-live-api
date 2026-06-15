@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: operations-live-backend
+    restart: unless-stopped
+    ports:
+      - '${PORT:-5000}:5000'
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:5000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      DATABASE_URL: ${DATABASE_URL:-file:/app/data/operations-live.db}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required and must be at least 32 characters}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      EXTERNAL_API_URL: ${EXTERNAL_API_URL:?EXTERNAL_API_URL is required}
+      EXTERNAL_API_KEY: ${EXTERNAL_API_KEY:?EXTERNAL_API_KEY is required}
+    volumes:
+      - operations_live_sqlite:/app/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(''http://127.0.0.1:5000/health'').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  operations_live_sqlite:
