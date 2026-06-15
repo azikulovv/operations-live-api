@@ -2,6 +2,8 @@ FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
 
+ENV DATABASE_URL=file:/tmp/build.db
+
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates openssl \
   && rm -rf /var/lib/apt/lists/*
