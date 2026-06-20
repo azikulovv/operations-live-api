@@ -1,4 +1,7 @@
 import { prisma } from '@/database/prisma'
+import { presentFinalTableListItem } from '@/modules/final-table/final-table.presenter'
+import { emitFinalTableListUpdated } from '@/modules/final-table/final-table.realtime'
+import { FinalTableRepository } from '@/modules/final-table/final-table.repository'
 import { ParticipantsService } from '@/modules/participants/participants.service'
 import { presentTournamentListItem } from '@/modules/tournament/tournament.presenter'
 import { TournamentRepository } from '@/modules/tournament/tournament.repository'
@@ -10,6 +13,7 @@ import type { UpdateTournamentDto } from '@/modules/tournament/tournament.schema
 
 export class TournamentService {
   private readonly participantsService = new ParticipantsService()
+  private readonly finalTableRepository = new FinalTableRepository(prisma)
   private readonly tournamentRepository = new TournamentRepository(prisma)
 
   async getEventTournament(externalEventId: string) {
@@ -22,7 +26,9 @@ export class TournamentService {
 
     const tournament = await this.tournamentRepository.upsertByParticipantId(participantId, dto)
     const eventId = tournament.participant.event.externalId
+    await this.finalTableRepository.reconcileAutomaticFinalTable(eventId)
     const list = await this.findPresentedList(eventId)
+    const finalTable = await this.finalTableRepository.findListByExternalEventId(eventId)
 
     emitTournamentUpdated({
       eventId,
@@ -31,6 +37,7 @@ export class TournamentService {
     })
 
     emitTournamentListUpdated(eventId, list)
+    emitFinalTableListUpdated(eventId, finalTable.map(presentFinalTableListItem))
 
     return tournament
   }

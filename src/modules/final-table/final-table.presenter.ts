@@ -8,6 +8,7 @@ type FinalTableListItem = {
     externalId: string
     externalUserId: string
     userName: string | null
+    userEmail: string | null
     badge: string | null
   }
 }
@@ -21,6 +22,7 @@ export function presentFinalTableListItem(item: FinalTableListItem) {
     seat: item.seat,
     badge: item.participant.badge,
     nickname: item.participant.userName,
+    email: item.participant.userEmail,
     stack: item.stack,
     updatedAt: item.updatedAt,
   }

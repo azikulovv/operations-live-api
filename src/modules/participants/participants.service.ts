@@ -12,6 +12,7 @@ import { DebtsRepository } from '@/modules/debts/debts.repository'
 import { mapExternalEventToCreateInput } from '@/modules/events/events.mapper'
 import { EventsRepository } from '@/modules/events/events.repository'
 import { presentFinalTableListItem } from '@/modules/final-table/final-table.presenter'
+import { isEligibleForFinalTable } from '@/modules/final-table/final-table.eligibility'
 import { emitFinalTableListUpdated } from '@/modules/final-table/final-table.realtime'
 import { FinalTableRepository } from '@/modules/final-table/final-table.repository'
 import { presentPaymentListItem } from '@/modules/payments/payments.presenter'
@@ -77,9 +78,8 @@ export class ParticipantsService {
     const event = await this.findOrCreateEvent(response.event)
     const externalParticipants = this.uniqueByExternalId(response.participants)
     const externalParticipantIds = externalParticipants.map(participant => participant.id)
-    const existingExternalIds = await this.participantsRepository.findExternalIds(
-      externalParticipantIds,
-    )
+    const existingExternalIds =
+      await this.participantsRepository.findExternalIds(externalParticipantIds)
 
     const participantsToCreate = externalParticipants
       .filter(participant => !existingExternalIds.has(participant.id))
@@ -112,11 +112,13 @@ export class ParticipantsService {
   async updateParticipant(participantId: string, dto: UpdateParticipantDto) {
     await this.ensureParticipantCanBeEdited(participantId)
 
-    const participant = await this.participantsRepository.updateByParticipantId(
-      participantId,
-      dto,
-    )
+    const participant = await this.participantsRepository.updateByParticipantId(participantId, dto)
     const eventId = participant.event.externalId
+
+    if (!isEligibleForFinalTable(participant)) {
+      await this.finalTableRepository.deleteByParticipantId(participantId)
+    }
+
     const list = await this.participantsRepository.findByEventId(participant.event.id)
 
     emitParticipantUpdated({
@@ -144,15 +146,18 @@ export class ParticipantsService {
   }
 
   private async emitOperationalListsUpdated(eventId: string) {
-    const [bartenderSales, debts, finalTable, payments, promotions, tournament] =
-      await Promise.all([
+    await this.finalTableRepository.reconcileAutomaticFinalTable(eventId)
+
+    const [bartenderSales, debts, finalTable, payments, promotions, tournament] = await Promise.all(
+      [
         this.bartenderSalesRepository.findListByExternalEventId(eventId),
         this.debtsRepository.findListByExternalEventId(eventId),
         this.finalTableRepository.findListByExternalEventId(eventId),
         this.paymentsRepository.findListByExternalEventId(eventId),
         this.promotionsRepository.findListByExternalEventId(eventId),
         this.tournamentRepository.findListByExternalEventId(eventId),
-      ])
+      ],
+    )
 
     emitBartenderSaleListUpdated(eventId, bartenderSales.map(presentBartenderSaleListItem))
     emitDebtListUpdated(eventId, debts.map(presentDebtListItem))
