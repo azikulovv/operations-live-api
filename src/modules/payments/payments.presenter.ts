@@ -1,3 +1,5 @@
+import { calculateTournamentToPayAmount } from '@/modules/payments/payments.calculator'
+
 type PaymentListItem = {
   id: string
   externalId: string
@@ -6,6 +8,7 @@ type PaymentListItem = {
   tableNumber: number | null
   seatNumber: number | null
   position: number | null
+  initialDepositAmount: number
   userName: string | null
   userEmail: string | null
   userPhone: string | null
@@ -20,6 +23,9 @@ type PaymentListItem = {
     status: string
     comment: string | null
     updatedAt: Date
+  } | null
+  bartenderSale: {
+    amount: number
   } | null
   promotion: {
     id: string
@@ -36,8 +42,19 @@ type PaymentListItem = {
 
 export function presentPaymentListItem(participant: PaymentListItem) {
   const accruedAmount = participant.payment?.accruedAmount ?? 0
+  const initialDepositAmount = participant.initialDepositAmount ?? 0
   const discountAmount = participant.payment?.discountAmount ?? 0
-  const toPayAmount = Math.max(accruedAmount - discountAmount, 0)
+  const promotionDiscountPercent =
+    participant.promotion?.promotionType === 'DEALER'
+      ? participant.promotion.discountPercent
+      : 0
+  const toPayAmount = calculateTournamentToPayAmount({
+    accruedAmount: initialDepositAmount,
+    discountAmount,
+    promotionDiscountPercent,
+  })
+  const barAmount = participant.bartenderSale?.amount ?? 0
+  const totalToPayAmount = toPayAmount + barAmount
 
   return {
     participantId: participant.id,
@@ -47,6 +64,7 @@ export function presentPaymentListItem(participant: PaymentListItem) {
     tableNumber: participant.tableNumber,
     seatNumber: participant.seatNumber,
     position: participant.position,
+    initialDepositAmount,
     user: {
       name: participant.userName,
       email: participant.userEmail,
@@ -60,6 +78,8 @@ export function presentPaymentListItem(participant: PaymentListItem) {
       accruedAmount,
       discountAmount,
       toPayAmount,
+      barAmount,
+      totalToPayAmount,
       paidAmount: participant.payment?.paidAmount ?? 0,
       status: participant.payment?.status ?? 'UNPAID',
       comment: participant.payment?.comment ?? null,

@@ -1,5 +1,6 @@
 import { prisma } from '@/database/prisma'
 import { ParticipantsService } from '@/modules/participants/participants.service'
+import { calculateTournamentToPayAmount } from '@/modules/payments/payments.calculator'
 import { presentShiftDashboard } from '@/modules/shift-dashboard/shift-dashboard.presenter'
 import { ShiftDashboardRepository } from '@/modules/shift-dashboard/shift-dashboard.repository'
 
@@ -15,11 +16,15 @@ export class ShiftDashboardService {
 
     const totals = participants.reduce(
       (acc, participant) => {
-        const tournamentAccrual = Math.max(
-          (participant.payment?.accruedAmount ?? 0) -
-            (participant.payment?.discountAmount ?? 0),
-          0,
-        )
+        const promotionDiscountPercent =
+          participant.promotion?.promotionType === 'DEALER'
+            ? participant.promotion.discountPercent
+            : 0
+        const tournamentAccrual = calculateTournamentToPayAmount({
+          ...participant.payment,
+          accruedAmount: participant.initialDepositAmount,
+          promotionDiscountPercent,
+        })
         const barAccrual = participant.bartenderSale?.amount ?? 0
         const dartsBilliardsAccrual = 0
         const participantTotalAccrued = tournamentAccrual + barAccrual + dartsBilliardsAccrual

@@ -9,6 +9,8 @@ export type ExternalEvent = {
   status: string
   participantLimit: number | null
   seatsPerTable: number | null
+  initialPaymentAmount: number | null
+  initialDepositAmount: number | null
   tableCount: number | null
   _count?: {
     registrations?: number

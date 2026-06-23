@@ -20,11 +20,18 @@ export class ShiftDashboardRepository {
         status: true,
         tableNumber: true,
         seatNumber: true,
+        initialDepositAmount: true,
         payment: {
           select: {
             accruedAmount: true,
             discountAmount: true,
             paidAmount: true,
+          },
+        },
+        promotion: {
+          select: {
+            promotionType: true,
+            discountPercent: true,
           },
         },
         bartenderSale: {

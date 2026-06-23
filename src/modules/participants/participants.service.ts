@@ -83,12 +83,21 @@ export class ParticipantsService {
 
     const participantsToCreate = externalParticipants
       .filter(participant => !existingExternalIds.has(participant.id))
-      .map(participant => mapExternalParticipantToCreateInput(participant, event.id))
+      .map(participant =>
+        mapExternalParticipantToCreateInput(
+          participant,
+          event.id,
+          event.initialDepositAmount,
+        ),
+      )
     const participantsToUpdate = externalParticipants
       .filter(participant => existingExternalIds.has(participant.id))
       .map(participant => ({
         externalId: participant.id,
-        data: mapExternalParticipantToSyncUpdateInput(participant),
+        data: mapExternalParticipantToSyncUpdateInput(
+          participant,
+          event.initialDepositAmount,
+        ),
       }))
 
     const [createResult, updateResult, cancelResult] = await Promise.all([
@@ -99,6 +108,7 @@ export class ParticipantsService {
         externalParticipantIds,
       ),
     ])
+    await this.paymentsRepository.createMissingInitialPaymentsForEvent(event.id)
 
     return {
       id: event.id,
@@ -177,9 +187,15 @@ export class ParticipantsService {
     externalEvent: Parameters<typeof mapExternalEventToCreateInput>[0],
   ) {
     const event = await this.eventsRepository.findByExternalId(externalEvent.id)
-    if (event) return event
-
     const createInput = mapExternalEventToCreateInput(externalEvent)
+    if (event) {
+      await this.eventsRepository.updateFromExternalEvents([createInput])
+      return {
+        ...event,
+        initialDepositAmount: createInput.initialDepositAmount ?? 0,
+      }
+    }
+
     return this.eventsRepository.create(createInput as Prisma.EventCreateInput)
   }
 }

@@ -25,6 +25,7 @@ export class PaymentsRepository {
         tableNumber: true,
         seatNumber: true,
         position: true,
+        initialDepositAmount: true,
         userName: true,
         userEmail: true,
         userPhone: true,
@@ -42,6 +43,11 @@ export class PaymentsRepository {
             updatedAt: true,
           },
         },
+        bartenderSale: {
+          select: {
+            amount: true,
+          },
+        },
         promotion: {
           select: {
             id: true,
@@ -57,6 +63,27 @@ export class PaymentsRepository {
         },
       },
       orderBy: [{ tableNumber: 'asc' }, { seatNumber: 'asc' }, { userName: 'asc' }],
+    })
+  }
+
+  async createMissingInitialPaymentsForEvent(eventId: string) {
+    const participantsWithoutPayment = await this.prisma.eventParticipant.findMany({
+      where: {
+        eventId,
+        payment: null,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (participantsWithoutPayment.length === 0) return { count: 0 }
+
+    return this.prisma.participantPayment.createMany({
+      data: participantsWithoutPayment.map(participant => ({
+        participantId: participant.id,
+        accruedAmount: 0,
+      })),
     })
   }
 

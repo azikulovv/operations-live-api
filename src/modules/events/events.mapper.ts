@@ -13,6 +13,7 @@ export function mapExternalEventToCreateInput(event: ExternalEvent): Prisma.Even
     endsAt: event.endsAt ? new Date(event.endsAt) : null,
     status: event.status,
     participantLimit: event.participantLimit,
+    initialDepositAmount: event.initialDepositAmount ?? 0,
     seatsPerTable: event.seatsPerTable,
     tableCount: event.tableCount ?? 0,
     registrationsCount: event._count?.registrations ?? 0,

@@ -36,6 +36,34 @@ export class EventsRepository {
     })
   }
 
+  async updateFromExternalEvents(events: Prisma.EventCreateManyInput[]) {
+    if (events.length === 0) return []
+
+    return this.prisma.$transaction(
+      events.map(event =>
+        this.prisma.event.update({
+          where: {
+            externalId: String(event.externalId),
+          },
+          data: {
+            title: event.title,
+            city: event.city,
+            address: event.address,
+            gameType: event.gameType,
+            startsAt: event.startsAt,
+            endsAt: event.endsAt,
+            status: event.status,
+            participantLimit: event.participantLimit,
+            initialDepositAmount: event.initialDepositAmount ?? 0,
+            seatsPerTable: event.seatsPerTable,
+            tableCount: event.tableCount,
+            registrationsCount: event.registrationsCount,
+          },
+        }),
+      ),
+    )
+  }
+
   async create(event: Prisma.EventCreateInput) {
     return this.prisma.event.create({
       data: event,

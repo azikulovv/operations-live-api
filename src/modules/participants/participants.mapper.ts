@@ -5,6 +5,7 @@ import type { ExternalParticipant } from '@/modules/participants/participants.ty
 export function mapExternalParticipantToCreateInput(
   participant: ExternalParticipant,
   eventId: string,
+  initialDepositAmount: number,
 ): Prisma.EventParticipantCreateManyInput {
   return {
     externalId: participant.id,
@@ -21,12 +22,14 @@ export function mapExternalParticipantToCreateInput(
     userPhone: participant.user?.phone ?? null,
     userTelegramId: participant.user?.telegramId ?? null,
     userAvatarUrl: participant.user?.avatarUrl ?? null,
+    initialDepositAmount,
     badge: null,
   }
 }
 
 export function mapExternalParticipantToSyncUpdateInput(
   participant: ExternalParticipant,
+  initialDepositAmount: number,
 ): Prisma.EventParticipantUpdateManyMutationInput {
   return {
     externalUserId: participant.userId,
@@ -38,5 +41,6 @@ export function mapExternalParticipantToSyncUpdateInput(
     userPhone: participant.user?.phone ?? null,
     userTelegramId: participant.user?.telegramId ?? null,
     userAvatarUrl: participant.user?.avatarUrl ?? null,
+    initialDepositAmount,
   }
 }

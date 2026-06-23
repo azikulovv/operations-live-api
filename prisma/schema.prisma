@@ -37,6 +37,7 @@ model Event {
   endsAt             DateTime?
   status             String
   participantLimit   Int?
+  initialDepositAmount Int     @default(0)
   seatsPerTable      Int?
   tableCount         Int
   registrationsCount Int
@@ -68,6 +69,7 @@ model EventParticipant {
   userTelegramId String?
   userAvatarUrl  String?
   badge          String?
+  initialDepositAmount Int     @default(0)
   arrived        Boolean                   @default(false)
   promotion      ParticipantPromotion?
   payment        ParticipantPayment?
@@ -122,13 +124,13 @@ model ParticipantPromotion {
 }
 
 model ParticipantPayment {
-  id             String  @id @default(cuid())
-  participantId  String  @unique
-  accruedAmount  Int     @default(0)
-  discountAmount Int     @default(0)
-  paidAmount     Int     @default(0)
-  status         String  @default("UNPAID")
-  comment        String?
+  id                    String  @id @default(cuid())
+  participantId         String  @unique
+  accruedAmount         Int     @default(0)
+  discountAmount        Int     @default(0)
+  paidAmount            Int     @default(0)
+  status                String  @default("UNPAID")
+  comment               String?
 
   participant EventParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 

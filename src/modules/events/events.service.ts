@@ -35,8 +35,16 @@ export class EventsService {
     const eventsToCreate = externalEvents
       .filter(event => !existingExternalIds.has(event.id))
       .map(mapExternalEventToCreateInput)
+    const eventsToUpdate = externalEvents
+      .filter(event => existingExternalIds.has(event.id))
+      .map(mapExternalEventToCreateInput)
 
-    const result = await this.eventsRepository.createMany(eventsToCreate)
+    const [result] = await Promise.all([
+      this.eventsRepository.createMany(eventsToCreate),
+      this.eventsRepository.updateFromExternalEvents(eventsToUpdate),
+    ])
+
+    console.log('Response:', response)
 
     return {
       created: result.count,
