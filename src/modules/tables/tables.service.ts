@@ -21,11 +21,6 @@ export class TablesService {
       tableNumber,
     )
     const maxPlayers = dto.maxPlayers ?? existingTable?.maxPlayers ?? event.seatsPerTable ?? 9
-    const playersCount = dto.playersCount ?? existingTable?.playersCount ?? 0
-
-    if (playersCount > maxPlayers) {
-      throw badRequest('Количество игроков не может быть больше максимума за столом')
-    }
 
     const table = await this.tablesRepository.upsertByEventIdAndTableNumber(
       event.id,
